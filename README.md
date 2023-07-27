@@ -1,3 +1,23 @@
+# Bedrock specifics
+If you are trying for Bedrock Lambda execution, if you hit
+```
+[ERROR] UnknownServiceError: Unknown service: 'bedrock'. Valid service names are: accessanalyzer
+```
+Make sure to grab SDK from https://preview.documentation.bedrock.aws.dev/Documentation/SDK/bedrock-python-sdk.zip
+When creating local lambda packages from .whl `pip install botocore-1.29.162-py3-none-any.whl -t .` & `pip install boto3-1.26.162-py3-none-any.whl -t .` , do it in separate directories.  On boto3, delete out your botocore it pulls (this is not the SDK version it needs)
+Turn into layers.   On lambda I did import boto3 and import botocore
+Print version to validate
+```
+def handler(event,context):
+    print(boto3.__version__)
+    print(botocore.__version__)
+```
+Your output (as of 7/26/23) should be
+```
+1.26.162
+1.29.162
+```
+
 
 # Welcome to your CDK Python project!
 
