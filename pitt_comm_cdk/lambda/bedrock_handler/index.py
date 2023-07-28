@@ -27,7 +27,7 @@ class Titan():
         prompt = 'Write a tweet As a Public Health Administrator for the ' + audience + '. The Tweet should contain only truthful information counteracting the claim "' + counteract + '". Confine it to 140 characters and include hashtags. Do not include harmful content.'
         return prompt
     def prompt_engineer_update_twitter( previous, prompt ):
-        prompt = 'Given the following tweet: "' + previous + '", rewrite it while still maintaining 140 characters and including hashtags to reflect the following request: "' + prompt + '". Do not include harmful content.'
+        prompt = 'Given the following tweet between <<" & ">> <<"' + previous + '">>. As a smart assistant, rewrite the tweet according to the following instructions: "' + prompt + '". Do not include harmful content.'
         return prompt
 
 def handler(event,context):
@@ -76,7 +76,7 @@ def handler(event,context):
         if platform == "Twitter":
             if mode == "baseline":
                 prompt = Titan.prompt_engineer_baseline_twitter( counteract, audience )
-            else:
+            elif mode == "update":
                 prompt = Titan.prompt_engineer_update_twitter( previous_prompt, new_prompt )
 
         print("Prompt: " + prompt + "\n")
@@ -86,8 +86,8 @@ def handler(event,context):
                 "textGenerationConfig": {
                     "maxTokenCount": 512,
                     "stopSequences": [],
-                    "temperature": 0,
-                    "topP": 0.8
+                    "temperature": .1,
+                    "topP": 1
                 } 
             }
         )
