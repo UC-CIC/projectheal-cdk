@@ -98,7 +98,7 @@ def handler(event,context):
         response = bedrock.invoke_model(body=bedrock_payload, modelId=modelId, accept=accept, contentType=contentType)
         response_body =  json.loads(response.get('body').read())
         print( response_body )
-        responses.append(response_body.get('results')[0].get('outputText'))
+        responses.append(response_body.get('results')[0].get('outputText').strip())
         # short circuit for fail safe
         i += 1
         if i > 3:
