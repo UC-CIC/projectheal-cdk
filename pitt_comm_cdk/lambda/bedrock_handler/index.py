@@ -15,7 +15,7 @@ CORS_HEADERS = {
 
 bedrock = boto3.client('bedrock' , 'us-east-1')
 TEMPERATURE=.1
-TOP_P=.9
+TOP_P=.8
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -42,21 +42,18 @@ class Titan():
         prompt += "As a nurse, write a single Reddit post that provides truthful information instead for the following audience" + audience + "\n\n"
         prompt += "The created Reddit post should include a TLDR at the end and not include harmful content."
         return prompt.replace("\n", " ")
-    
-    def prompt_engineer_update_twitter( previous, promp_instructions ):
-        prompt = "As a nurse you read the following Tweet: " + previous + "\n\n"
-        prompt += "You want to update the Tweet according to the following instruction:" + promp_instructions + "\n\n"
-        prompt += "Answer with the update and do not include harmful content."
+
+    def prompt_engineer_update_twitter( previous, prompt_instructions ):
+        prompt = "Who you are:  You are a smart assistant.  Prompt: " + previous + "\n\nOutput only text."
+        prompt += "Prompt:" + prompt_instructions + "\n\n"
         return prompt.replace("\n", " ")
-    def prompt_engineer_update_blog( previous, promp_instructions ):
-        prompt = "As a nurse you read the following blog post: " + previous + "\n\n"
-        prompt += "You want to update the Tweet according to the following instruction:" + promp_instructions + "\n\n"
-        prompt += "Answer with the update and do not include harmful content."
+    def prompt_engineer_update_blog( previous, prompt_instructions ):
+        prompt = "Who you are:  You are a smart assistant.  Prompt: " + previous + "\n\nOutput only text."
+        prompt += "Prompt:" + prompt_instructions + "\n\n"
         return prompt.replace("\n", " ")
-    def prompt_engineer_update_reddit( previous, promp_instructions ):
-        prompt = "As a nurse you read the following Reddit post: " + previous + "\n\n"
-        prompt += "You want to update the Tweet according to the following instruction:" + promp_instructions + "\n\n"
-        prompt += "Answer with the update and do not include harmful content."
+    def prompt_engineer_update_reddit( previous, prompt_instructions ):
+        prompt = "Who you are:  You are a smart assistant.  Prompt: " + previous + "\n\nOutput only text."
+        prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text."
         return prompt.replace("\n", " ")    
 
 def handler(event,context):
