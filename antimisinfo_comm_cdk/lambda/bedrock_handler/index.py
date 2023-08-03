@@ -44,16 +44,16 @@ class Titan():
         return prompt.replace("\n", " ")
 
     def prompt_engineer_update_twitter( previous, prompt_instructions ):
-        prompt = "Who you are:  You are a smart assistant.  Prompt: " + previous + "\n\nOutput only text."
-        prompt += "Prompt:" + prompt_instructions + "\n\n"
+        prompt = "Who you are:  You are a smart assistant.  Text: " + previous + "\n\n"
+        prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text."
         return prompt.replace("\n", " ")
     def prompt_engineer_update_blog( previous, prompt_instructions ):
-        prompt = "Who you are:  You are a smart assistant.  Prompt: " + previous + "\n\nOutput only text."
-        prompt += "Prompt:" + prompt_instructions + "\n\n"
+        prompt = "Who you are:  You are a smart assistant.  Text: " + previous + "\n\n"
+        prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text."
         return prompt.replace("\n", " ")
     def prompt_engineer_update_reddit( previous, prompt_instructions ):
-        prompt = "Who you are:  You are a smart assistant.  Prompt: " + previous + "\n\nOutput only text."
-        prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text."
+        prompt = "Who you are:  You are a smart assistant.  Text: " + previous + "\n\n"
+        prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text.Output only text."
         return prompt.replace("\n", " ")    
 
 def handler(event,context):

@@ -2,10 +2,10 @@
 
 import aws_cdk as cdk
 
-from pitt_comm_cdk.pitt_comm_cdk_stack import PittCommCdkStack
+from antimisinfo_comm_cdk.antimisinfo_comm_cdk_stack import AntiMisinfoCommCdkStack
 
 
 app = cdk.App()
-PittCommCdkStack(app, "pitt-comm-cdk")
+AntiMisinfoCommCdkStack(app, "antimisinfo-comm-cdk")
 
 app.synth()

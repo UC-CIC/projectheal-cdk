@@ -10,7 +10,7 @@ from aws_cdk import (
 )
 
 
-class PittCommCdkStack(Stack):
+class AntiMisinfoCommCdkStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -21,7 +21,7 @@ class PittCommCdkStack(Stack):
 
         layer_bedrock_sdk = lambda_.LayerVersion(
             self, "layer_bedrock_sdk",
-            code=lambda_.Code.from_asset(os.path.join("pitt_comm_cdk/lambda/custom_packages/layers","bedrock-boto3-1.26.162.zip")),
+            code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","bedrock-boto3-1.26.162.zip")),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
             description="SDK to support bedrock.",
             layer_version_name="layer_bedrock_sdk"
@@ -29,7 +29,7 @@ class PittCommCdkStack(Stack):
 
         layer_bedrock_botocore_sdk = lambda_.LayerVersion(
             self, "layer_bedrock_botocore_sdk",
-            code=lambda_.Code.from_asset(os.path.join("pitt_comm_cdk/lambda/custom_packages/layers","bedrock-botocore-1.26.162.zip")),
+            code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","bedrock-botocore-1.26.162.zip")),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
             description="SDK to support bedrock.",
             layer_version_name="layer_bedrock_botocore_sdk"
@@ -48,7 +48,7 @@ class PittCommCdkStack(Stack):
             handler="index.handler",
             role=bedrock_lambda_role,
             timeout=Duration.seconds(300),  
-            code=lambda_.Code.from_asset(os.path.join("pitt_comm_cdk/lambda","bedrock_handler")),
+            code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda","bedrock_handler")),
             environment={
                 "CORS_ALLOW_UI":FULL_CFRONT_URL,
                 "LOCALHOST_ORIGIN":LOCALHOST_ORIGIN if ALLOW_LOCALHOST_ORIGIN else "",
