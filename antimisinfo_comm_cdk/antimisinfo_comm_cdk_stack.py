@@ -56,6 +56,22 @@ class AntiMisinfoCommCdkStack(Stack):
             layers=[ layer_bedrock_sdk,layer_bedrock_botocore_sdk ]
         )
 
+        fn_bedrock_vector_handler = lambda_.Function(
+            self,"fn-bedrock-vector-handler",
+            description="fn-bedrock-vector-handler", #microservice tag
+            runtime=lambda_.Runtime.PYTHON_3_9,
+            handler="index.handler",
+            role=bedrock_lambda_role,
+            timeout=Duration.seconds(300),  
+            code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda","bedrock_vector_handler")),
+            environment={
+                "CORS_ALLOW_UI":FULL_CFRONT_URL,
+                "LOCALHOST_ORIGIN":LOCALHOST_ORIGIN if ALLOW_LOCALHOST_ORIGIN else "",
+            },
+            layers=[ layer_bedrock_sdk,layer_bedrock_botocore_sdk ]
+        )
+
+
         bedrock_lambda_role.attach_inline_policy(iam.Policy(self, "bedrock-allow-policy",
             statements=[iam.PolicyStatement(
                 actions=["bedrock:InvokeModel"],
@@ -95,7 +111,13 @@ class AntiMisinfoCommCdkStack(Stack):
             "POST",communication_post_integration,
             api_key_required=True
         )       
-
+        # POST: /generate/embeddings
+        public_route_embeddings=public_route_generate.add_resource("embeddings")
+        embeddings_post_integration=apigateway.LambdaIntegration(fn_bedrock_vector_handler)
+        method_embeding_post=public_route_embeddings.add_method(
+            "POST",embeddings_post_integration,
+            api_key_required=True
+        )     
 
         #################################################################################
         # Usage plan and api key to "lock" API to only CFRONT calls (or local in our case)

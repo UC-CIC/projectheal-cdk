@@ -27,33 +27,33 @@ class Titan():
     def prompt_engineer_baseline_twitter( counteract, audience ):
         prompt = "You are a nurse needing to combat incorrect information.\n"
         prompt += "You have been given the following list of incorrect statements:\n" + counteract + "\n\n"
-        prompt += "As a nurse, write a single Tweet that provides truthful information instead for the following audience: " + audience + "\n\n"
-        prompt += "The created Tweet should contain three hashtags and not include harmful content."
+        prompt += "As a nurse, write a single Tweet that provides only truthful information instead for the following audience: " + audience + "\n\n"
+        prompt += "The created Tweet should contain three hashtags and not include harmful or incorrect content."
         return prompt.replace("\n", " ")
     def prompt_engineer_baseline_blog( counteract, audience ):
         prompt = "You are a nurse needing to combat incorrect information.\n"
         prompt += "You have been given the following list of incorrect statements:\n" + counteract + "\n\n"
-        prompt += "As a nurse, write a single blog post that provides truthful information instead for the following audience" + audience + "\n\n"
-        prompt += "The created blog post should be no longer than three paragraphs and not include harmful content."
+        prompt += "As a nurse, write a single blog post that provides only truthful information instead for the following audience" + audience + "\n\n"
+        prompt += "The created blog post should be no longer than three paragraphs and not include harmful or incorrect content."
         return prompt.replace("\n", " ")
     def prompt_engineer_baseline_reddit( counteract, audience ):
         prompt = "You are a health professional needing to combat incorrect information.\n"
         prompt += "You have been given the following list of incorrect statements:\n" + counteract + "\n\n"
-        prompt += "As a nurse, write a single Reddit post that provides truthful information instead for the following audience" + audience + "\n\n"
-        prompt += "The created Reddit post should include a TLDR at the end and not include harmful content."
+        prompt += "As a nurse, write a single Reddit post that provides only truthful information instead for the following audience" + audience + "\n\n"
+        prompt += "The created Reddit post should include a TLDR at the end and not include harmful or incorrect content."
         return prompt.replace("\n", " ")
 
     def prompt_engineer_update_twitter( previous, prompt_instructions ):
-        prompt = "Who you are:  You are a smart assistant.  Text: " + previous + "\n\n"
+        prompt = "You are a smart assistant.  Update text based on prompt. Text: " + previous + "\n\n"
         prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text."
         return prompt.replace("\n", " ")
     def prompt_engineer_update_blog( previous, prompt_instructions ):
-        prompt = "Who you are:  You are a smart assistant.  Text: " + previous + "\n\n"
+        prompt = "You are a smart assistant.  Update text based on prompt.  Text: " + previous + "\n\n"
         prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text."
         return prompt.replace("\n", " ")
     def prompt_engineer_update_reddit( previous, prompt_instructions ):
-        prompt = "Who you are:  You are a smart assistant.  Text: " + previous + "\n\n"
-        prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text.Output only text."
+        prompt = "You are a smart assistant.  Update text based on prompt. Text: " + previous + "\n\n"
+        prompt += "Prompt:" + prompt_instructions + "\n\nOutput only text."
         return prompt.replace("\n", " ")    
 
 def handler(event,context):
@@ -121,7 +121,7 @@ def handler(event,context):
         {
             "inputText": prompt,
             "textGenerationConfig": {
-                "maxTokenCount": 512,
+                "maxTokenCount": 1024,
                 "stopSequences": [],
                 "temperature": TEMPERATURE,
                 "topP": TOP_P
