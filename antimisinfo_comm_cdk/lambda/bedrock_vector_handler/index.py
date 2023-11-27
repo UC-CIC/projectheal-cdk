@@ -13,7 +13,7 @@ CORS_HEADERS = {
     'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT'
 }
 
-bedrock = boto3.client('bedrock' , 'us-east-1')
+bedrock = boto3.client('bedrock-runtime' , 'us-east-1')
 TEMPERATURE=.1
 TOP_P=.8
 

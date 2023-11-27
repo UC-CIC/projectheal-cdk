@@ -19,6 +19,7 @@ class AntiMisinfoCommCdkStack(Stack):
         FULL_CFRONT_URL=""
         LOCALHOST_ORIGIN="http://localhost:3000"
 
+        '''
         layer_bedrock_sdk = lambda_.LayerVersion(
             self, "layer_bedrock_sdk",
             code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","bedrock-boto3-1.26.162.zip")),
@@ -30,6 +31,15 @@ class AntiMisinfoCommCdkStack(Stack):
         layer_bedrock_botocore_sdk = lambda_.LayerVersion(
             self, "layer_bedrock_botocore_sdk",
             code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","bedrock-botocore-1.26.162.zip")),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
+            description="SDK to support bedrock.",
+            layer_version_name="layer_bedrock_botocore_sdk"
+        )
+        '''
+
+        layer_bedrock_boto3_sdk = lambda_.LayerVersion(
+            self, "layer_bedrock_botocore_sdk",
+            code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","boto3-1.29.7.zip")),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
             description="SDK to support bedrock.",
             layer_version_name="layer_bedrock_botocore_sdk"
@@ -53,7 +63,7 @@ class AntiMisinfoCommCdkStack(Stack):
                 "CORS_ALLOW_UI":FULL_CFRONT_URL,
                 "LOCALHOST_ORIGIN":LOCALHOST_ORIGIN if ALLOW_LOCALHOST_ORIGIN else "",
             },
-            layers=[ layer_bedrock_sdk,layer_bedrock_botocore_sdk ]
+            layers=[ layer_bedrock_boto3_sdk ]
         )
 
         fn_bedrock_vector_handler = lambda_.Function(
@@ -68,7 +78,7 @@ class AntiMisinfoCommCdkStack(Stack):
                 "CORS_ALLOW_UI":FULL_CFRONT_URL,
                 "LOCALHOST_ORIGIN":LOCALHOST_ORIGIN if ALLOW_LOCALHOST_ORIGIN else "",
             },
-            layers=[ layer_bedrock_sdk,layer_bedrock_botocore_sdk ]
+            layers=[ layer_bedrock_boto3_sdk ]
         )
 
 

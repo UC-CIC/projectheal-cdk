@@ -1,33 +1,7 @@
-# Setup specifics
-1. Bootstrap your CDK environment
-2. Build a layer for Bedrock SDK boto3 & Bedrock SDK botocore
-3. Zip the layers; these should be placed in lambda>custom_packages>layers as `bedrock-boto3-1.26.162.zip` & `bedrock-botocore-1.26.162.zip`
-4. CDK Deploy
-
-# Bedrock specifics
-If you are trying for Bedrock Lambda execution, if you hit
-```
-[ERROR] UnknownServiceError: Unknown service: 'bedrock'. Valid service names are: accessanalyzer
-```
-Make sure to grab SDK from https://preview.documentation.bedrock.aws.dev/Documentation/SDK/bedrock-python-sdk.zip
-When creating local lambda packages from .whl `pip install botocore-1.29.162-py3-none-any.whl -t .` & `pip install boto3-1.26.162-py3-none-any.whl -t .` , do it in separate directories.  On boto3, delete out your botocore it pulls (this is not the SDK version it needs)
-Turn into layers.   On lambda I did import boto3 and import botocore
-Print version to validate
-```
-def handler(event,context):
-    print(boto3.__version__)
-    print(botocore.__version__)
-```
-Your output (as of 7/26/23) should be
-```
-1.26.162
-1.29.162
-```
-
 
 # Welcome to your CDK Python project!
 
-You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`antimisinfo_comm_cdk_stack`)
+You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`tmp_stack`)
 which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
