@@ -167,9 +167,9 @@ def handler(event,context):
         counteract += str(count+1) + ") " + entry + "\n"
 
     kb_prompt = """I'm a public official who finds evidence to dispute claims of misinformation. I receive a claim: ${misinformationText}. What evidence can I use to dispute this claim to the public?"""
-    print(kb_prompt)
     kb_prompt.format(misinformationText=counteract)
-
+    print(kb_prompt)
+    
     kb_response=retrieveAndGenerate(counteract, kb_id,model_id=modelId)
     citations = []
     try:
