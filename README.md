@@ -1,4 +1,10 @@
 
+# Note
+
+Uses expiremental `import cdklabs.generative_ai_cdk_constructs` to deploy knowledge base
+
+Requires docker to deploy.
+
 # Welcome to your CDK Python project!
 
 You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`tmp_stack`)

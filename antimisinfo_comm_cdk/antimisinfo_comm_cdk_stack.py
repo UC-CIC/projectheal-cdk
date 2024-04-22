@@ -6,9 +6,11 @@ from aws_cdk import (
     aws_lambda as lambda_,
     Duration,
     aws_apigateway as apigateway,
-    aws_iam as iam
+    aws_iam as iam,
+    aws_s3 as s3
 )
 
+import cdklabs.generative_ai_cdk_constructs
 
 class AntiMisinfoCommCdkStack(Stack):
 
@@ -22,6 +24,22 @@ class AntiMisinfoCommCdkStack(Stack):
         LOCALHOST_ORIGIN="http://localhost:3000"
         #######################################################
 
+
+        kb = cdklabs.generative_ai_cdk_constructs.bedrock.KnowledgeBase(self, 'KnowledgeBase', 
+                    embeddings_model= cdklabs.generative_ai_cdk_constructs.bedrock.BedrockFoundationModel.TITAN_EMBED_TEXT_V1,
+                    instruction= 'This KB contains trusted information about health topics.'                     
+                )
+
+        docBucket = s3.Bucket(self, 'DockBucket')
+
+        cdklabs.generative_ai_cdk_constructs.bedrock.S3DataSource(self, 'DataSource',
+            bucket= docBucket,
+            knowledge_base=kb,
+            data_source_name='trusted',
+            chunking_strategy=cdklabs.generative_ai_cdk_constructs.bedrock.ChunkingStrategy.FIXED_SIZE,
+            max_tokens=500,
+            overlap_percentage=20   
+        )
 
         '''
         layer_bedrock_sdk = lambda_.LayerVersion(
@@ -67,6 +85,7 @@ class AntiMisinfoCommCdkStack(Stack):
             environment={
                 "CORS_ALLOW_UI":FULL_CFRONT_URL,
                 "LOCALHOST_ORIGIN":LOCALHOST_ORIGIN if ALLOW_LOCALHOST_ORIGIN else "",
+                "KB_ID":kb.knowledge_base_id
             },
             layers=[ layer_bedrock_boto3_sdk ]
         )
@@ -94,7 +113,7 @@ class AntiMisinfoCommCdkStack(Stack):
 
         bedrock_lambda_role.attach_inline_policy(iam.Policy(self, "bedrock-allow-policy",
             statements=[iam.PolicyStatement(
-                actions=["bedrock:InvokeModel"],
+                actions=["bedrock:InvokeModel","bedrock:RetrieveAndGenerate","bedrock:Retrieve"],
                 resources=["*"]
             )             
             ]
