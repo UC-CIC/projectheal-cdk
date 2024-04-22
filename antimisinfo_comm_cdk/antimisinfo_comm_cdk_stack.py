@@ -15,15 +15,19 @@ class AntiMisinfoCommCdkStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        #######################################################
+        #hardcoded -- fix later
         ALLOW_LOCALHOST_ORIGIN=True
-        FULL_CFRONT_URL=""
+        FULL_CFRONT_URL="h"
         LOCALHOST_ORIGIN="http://localhost:3000"
+        #######################################################
+
 
         '''
         layer_bedrock_sdk = lambda_.LayerVersion(
             self, "layer_bedrock_sdk",
             code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","bedrock-boto3-1.26.162.zip")),
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_11],
             description="SDK to support bedrock.",
             layer_version_name="layer_bedrock_sdk"
         )
@@ -31,7 +35,7 @@ class AntiMisinfoCommCdkStack(Stack):
         layer_bedrock_botocore_sdk = lambda_.LayerVersion(
             self, "layer_bedrock_botocore_sdk",
             code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","bedrock-botocore-1.26.162.zip")),
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_11],
             description="SDK to support bedrock.",
             layer_version_name="layer_bedrock_botocore_sdk"
         )
@@ -39,8 +43,8 @@ class AntiMisinfoCommCdkStack(Stack):
 
         layer_bedrock_boto3_sdk = lambda_.LayerVersion(
             self, "layer_bedrock_botocore_sdk",
-            code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","boto3-1.29.7.zip")),
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_9],
+            code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda/custom_packages/layers","boto3.zip")),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_11],
             description="SDK to support bedrock.",
             layer_version_name="layer_bedrock_botocore_sdk"
         )
@@ -51,10 +55,11 @@ class AntiMisinfoCommCdkStack(Stack):
             )
         )
 
+ 
         fn_bedrock_handler = lambda_.Function(
             self,"fn-bedrock-handler",
             description="fn-bedrock-handler", #microservice tag
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_11,
             handler="index.handler",
             role=bedrock_lambda_role,
             timeout=Duration.seconds(300),  
@@ -66,17 +71,22 @@ class AntiMisinfoCommCdkStack(Stack):
             layers=[ layer_bedrock_boto3_sdk ]
         )
 
+
+
+        #######################################################
+        #hardcoded -- fix later (origin vars)
+        #######################################################
         fn_bedrock_vector_handler = lambda_.Function(
             self,"fn-bedrock-vector-handler",
             description="fn-bedrock-vector-handler", #microservice tag
-            runtime=lambda_.Runtime.PYTHON_3_9,
+            runtime=lambda_.Runtime.PYTHON_3_11,
             handler="index.handler",
             role=bedrock_lambda_role,
             timeout=Duration.seconds(300),  
             code=lambda_.Code.from_asset(os.path.join("antimisinfo_comm_cdk/lambda","bedrock_vector_handler")),
             environment={
-                "CORS_ALLOW_UI":FULL_CFRONT_URL,
-                "LOCALHOST_ORIGIN":LOCALHOST_ORIGIN if ALLOW_LOCALHOST_ORIGIN else "",
+                "CORS_ALLOW_UI":"",
+                "LOCALHOST_ORIGIN":"*",
             },
             layers=[ layer_bedrock_boto3_sdk ]
         )
@@ -96,6 +106,12 @@ class AntiMisinfoCommCdkStack(Stack):
             )             
             ]
         ))
+
+
+
+        #######################################################
+        #hardcoded -- fix later (allow origin)
+        #######################################################
         core_api = apigateway.RestApi(
             self,"core-api",
             endpoint_configuration=apigateway.EndpointConfiguration(
@@ -103,7 +119,8 @@ class AntiMisinfoCommCdkStack(Stack):
             ),
             default_cors_preflight_options=apigateway.CorsOptions(
                 allow_methods=['GET', 'OPTIONS','PUT','PATCH','POST'],
-                allow_origins=[FULL_CFRONT_URL, LOCALHOST_ORIGIN if ALLOW_LOCALHOST_ORIGIN else ""])
+                #allow_origins=[FULL_CFRONT_URL, LOCALHOST_ORIGIN if ALLOW_LOCALHOST_ORIGIN else ""])
+                allow_origins=["*"])
         )
 
         ###### Route Base = /api [match for cloud front purposes]
