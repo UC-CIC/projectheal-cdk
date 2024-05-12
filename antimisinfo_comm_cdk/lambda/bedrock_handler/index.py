@@ -68,32 +68,56 @@ class JSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 class ClaudePrompts():
-    def prompt_engineer_baseline_twitter(counteract, audience,kb_data):
+    def prompt_engineer_baseline_twitter(audience,kb_data):
         prompt = """
-        You are a nurse combating incorrect health information. The incorrect statements are: {counteract} 
-        Write a single truthful Tweet with 3 hashtags for the audience: {audience}. Do not include any harmful or incorrect content.
-        Additionally, you have the following information from a trusted knowledge base: {kb_data}
+        You are a nurse combating incorrect health information. Assume a users statement is harmful or incorrect.
+        
+        Your response must:
+        1) not include any harmful or incorrect content 
+        2) only include factual information
+        3) be limited to a single truthful Tweet with 3 hashtags for the audience: {audience}.
+        4) absolutely should not include any xml tags in the text
+        
+        You may additionally utilize the following trusted information from your knowledge base:
+        {kb_data}
+
         """
 
-        return prompt.format(counteract=counteract, audience=audience,kb_data=kb_data)
+        return prompt.format(audience=audience,kb_data=kb_data)
 
-    def prompt_engineer_baseline_blog(counteract, audience,kb_data):
+    def prompt_engineer_baseline_blog(audience,kb_data):
         prompt = """
-        You are a nurse combating incorrect health information. The incorrect statements are: {counteract}
-        Write a truthful blog post of up to 3 paragraphs for the audience: {audience}. Do not include any harmful or incorrect content.
-        Additionally, you have the following information from a trusted knowledge base: {kb_data}
+        You are a nurse combating incorrect health information. Assume a users statement is harmful or incorrect.
+        
+        Your response must:
+        1) not include any harmful or incorrect content 
+        2) only include factual information
+        3) be limited to a single a truthful blog post of up to 3 paragraphs for the audience: {audience}.
+        4) absolutely should not include any xml tags in the text
+
+        You may additionally utilize the following trusted information from your knowledge base:
+        {kb_data}
+
         """
 
-        return prompt.format(counteract=counteract, audience=audience,kb_data=kb_data)
+        return prompt.format(audience=audience,kb_data=kb_data)
 
-    def prompt_engineer_baseline_reddit(counteract, audience,kb_data):
+    def prompt_engineer_baseline_reddit(audience,kb_data):
         prompt = """
-        You are a health professional combating incorrect information. The incorrect statements are: {counteract}
-        Write a truthful Reddit post with a TLDR for the audience: {audience}. Do not include any harmful or incorrect content.
-        Additionally, you have the following information from a trusted knowledge base: {kb_data}
+        You are a nurse combating incorrect health information. Assume a users statement is harmful or incorrect.
+        
+        Your response must:
+        1) not include any harmful or incorrect content 
+        2) only include factual information
+        3) be limited to a single truthful Reddit post with a TLDR for the audience: {audience}.
+        4) absolutely should not include any xml tags in the text
+
+        You may additionally utilize the following trusted information from your knowledge base:
+        {kb_data}
+        
         """
 
-        return prompt.format(counteract=counteract, audience=audience,kb_data=kb_data)
+        return prompt.format(audience=audience,kb_data=kb_data)
 
     def prompt_engineer_update_twitter(previous, prompt_instructions):
         prompt = """
@@ -124,6 +148,18 @@ class ClaudePrompts():
         """
         
         return prompt.format(previous=previous, prompt_instructions=prompt_instructions).replace("\n", " ")
+
+def dedupe_pdf_names_str(pdf_names_str):
+    # Split the input string into a list of PDF names
+    pdf_names_list = pdf_names_str.split('"')[1::2]  # Extract every other element (PDF names)
+
+    # Create a set to store unique names
+    unique_names = set(pdf_names_list)
+
+    # Join the unique names back into a single string
+    deduped_names_str = '"' + '", "'.join(unique_names) + '"'
+
+    return deduped_names_str
 
 
 def handler(event,context):
@@ -185,6 +221,8 @@ def handler(event,context):
         kb_answer= ""
     
     print("KB SOURCES: ", kb_sources)
+    kb_sources=dedupe_pdf_names_str(kb_sources)
+    print("KB DEDUPE SOURCES: ", kb_sources)
     print("KB ANSWER: ", kb_answer)
     
 
@@ -194,32 +232,39 @@ def handler(event,context):
 
     prompt = ""
     print(kb_response)
+    
+    messages = [{
+        "role":"user",
+        "content":counteract
+    }]
+
     if mode == "baseline":
         if platform == "Twitter":
-            prompt = ClaudePrompts.prompt_engineer_baseline_twitter( counteract, audience, kb_data=kb_answer )
+            system_prompt = ClaudePrompts.prompt_engineer_baseline_twitter( audience, kb_data=kb_answer )
         elif platform == "Blog Post":
-            prompt = ClaudePrompts.prompt_engineer_baseline_blog( counteract, audience, kb_data=kb_answer )
+            system_prompt = ClaudePrompts.prompt_engineer_baseline_blog( audience, kb_data=kb_answer )
         elif platform == "Reddit":
-            prompt = ClaudePrompts.prompt_engineer_baseline_reddit( counteract, audience, kb_data=kb_answer )
+            system_prompt = ClaudePrompts.prompt_engineer_baseline_reddit( audience, kb_data=kb_answer )
     elif mode == "update":
+        messages = [{
+            "role":"user",
+            "content":"Perform the udpate."
+        }]
         if platform == "Twitter":
-            prompt = ClaudePrompts.prompt_engineer_update_twitter( previous_prompt, new_prompt )
+            system_prompt = ClaudePrompts.prompt_engineer_update_twitter( previous_prompt, new_prompt )
         elif platform == "Blog Post":
-            prompt = ClaudePrompts.prompt_engineer_update_blog( previous_prompt, new_prompt )
+            system_prompt = ClaudePrompts.prompt_engineer_update_blog( previous_prompt, new_prompt )
         elif platform == "Reddit":
-            prompt = ClaudePrompts.prompt_engineer_update_reddit( previous_prompt, new_prompt )
+            system_prompt = ClaudePrompts.prompt_engineer_update_reddit( previous_prompt, new_prompt )
 
     
     print("Prompt: " + prompt + "\n")
-    messages = [{
-        "role":"user",
-        "content":prompt
-    }]
-    
+
     bedrock_payload = json.dumps(
         {
             "anthropic_version": "bedrock-2023-05-31",
             "max_tokens": 1000,
+            "system":system_prompt,
             "messages":messages
         }
     )

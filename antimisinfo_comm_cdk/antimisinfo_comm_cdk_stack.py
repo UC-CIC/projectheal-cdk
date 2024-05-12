@@ -20,7 +20,7 @@ class AntiMisinfoCommCdkStack(Stack):
         #######################################################
         #hardcoded -- fix later
         ALLOW_LOCALHOST_ORIGIN=True
-        FULL_CFRONT_URL="h"
+        FULL_CFRONT_URL=""
         LOCALHOST_ORIGIN="http://localhost:3000"
         #######################################################
 
